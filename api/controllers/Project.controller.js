@@ -15,6 +15,7 @@ export const addProject = async (req, res, next) => {
       tasks, 
     } = req.body;
 
+
     const project_managerId = req.user.id; 
 
     
