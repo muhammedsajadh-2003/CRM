@@ -11,7 +11,7 @@ const generateToken = (userId, role) => {
 export const signUp = async (req, res) => {
   const { firstName, lastName, role = "employee", email, password } = req.body;
 
-  const missingFields = ["firstName", "lastName", "email", "password"].filter(
+  const missingFields = ["firstName", "lastName", "email", "password","role"].filter(
     (field) => !req.body[field]
   );
 
@@ -26,8 +26,8 @@ export const signUp = async (req, res) => {
 
   if (password.length > 8) {
     return res.status(400).json({
-        success: false,
-        message:"Password must be at least 8 charactres long"
+      success: false,
+      message: "Password must be at least 8 charactres long",
     });
   }
 
@@ -95,7 +95,11 @@ export const signIn = async (req, res) => {
 
     const token = generateToken(user._id, user.role);
 
-    const { password: _, _id:id, ...userData } = user._doc;
+    
+
+    const { password: _, _id: id, ...userData } = user._doc;
+
+    console.log("User", userData);
 
     res
       .status(200)
@@ -117,6 +121,8 @@ export const signOut = async (req, res) => {
     return res.status(200).json({ success: true, message: "SignOut success" });
   } catch (error) {
     console.error("Sign Out Error:", error);
-    return res.status(500).json({ success: false, message: "internal Server Error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "internal Server Error" });
   }
 };

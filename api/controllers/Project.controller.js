@@ -1,6 +1,7 @@
 import Project from "../models/project.model.js";
 import User from "../models/user.model.js"; 
 import { errorHandler } from "../utils/index.js"; 
+import mongoose from "mongoose";
 
 export const addProject = async (req, res, next) => {
   try {
@@ -9,7 +10,7 @@ export const addProject = async (req, res, next) => {
       description,
       startDate,
       endDate,
-      employee, 
+      teamMembers, 
       status,
       priority,
       tasks, 
@@ -25,21 +26,24 @@ export const addProject = async (req, res, next) => {
       );
     }
 
-    if (req.user.role !== "project_manager" || req.user.role !== "admin") {
-      return res.status(403).json({ success: false, message: "Access denied" });
+    if (!["admin", "project_manager"].includes(req.user.role)) {
+      return res.status(403).json({ success: false, message: "You can't access this api",user:req.user});
     }
 
-    const project_manager = await User.findById(req.user.id);
-    if (!project_manager) {
+    const Manager = await User.findById(req.user.id);
+    if (!Manager) {
       return res
         .status(404)
         .json({ success: false, message: "Manager not found" });
     }
 
     
-    const teamMembersArray = employee
-      ? employee.split(",").map((id) => id.trim())
+    const teamMembersArray = Array.isArray(teamMembers)
+      ? teamMembers
+      : typeof teamMembers === "string"
+      ? teamMembers.split(",").map((id) => id.trim())
       : [];
+
 
     if (teamMembersArray.length < 1) {
       return res
@@ -70,8 +74,8 @@ export const addProject = async (req, res, next) => {
         description,
         startDate,
         endDate,
-        project_manager: project_managerId,
-        employee: teamMembersArray,
+        Manager: project_managerId,
+        teamMembers: teamMembersArray,
         status,
         priority,
         tasks: formattedTasks,

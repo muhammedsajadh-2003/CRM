@@ -17,7 +17,7 @@ const projectSchema = new mongoose.Schema({
   endDate: {
     type: Date,
   },
-  manager: {
+  Manager: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
